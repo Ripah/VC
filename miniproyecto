@@ -1,0 +1,18 @@
+function [ result ] = ROI( background, objectimage )
+    DIF = background - objectimage;
+    DIF =  max(DIF,[],3);
+    Edges = im2bw(DIF, 0.2);
+    result = imfill(Edges, 'holes');
+end
+
+
+function [ featureVector, hogVisualization ] = HOG( image )
+    [featureVector, hogVisualization] = extractHOGFeatures(image);
+    figure;
+    imshow(image); hold on;
+    plot(hogVisualization);
+end
+
+
+R = ROI(b,imread('VC (3).png'));
+imshow(HOG(uint8(cat(3,R,R,R)) .* imread('VC (3).png')));
