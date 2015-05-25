@@ -6,11 +6,31 @@ function [ result ] = ROI( background, objectimage )
 end
 
 
-function [ featureVector, hogVisualization ] = HOG( image )
-    [featureVector, hogVisualization] = extractHOGFeatures(image);
-    figure;
-    imshow(image); hold on;
-    plot(hogVisualization);
+function [ histogram ] = HOG( I )
+
+    if size(I, 3) == 3
+        I = rgb2gray(I);
+    end
+    Gx = [-1, 0, 1; -2, 0, 2; -1, 0, 1];
+    Gy = [1, 2, 1; 0, 0, 0; -1, -2, -1];
+    X = imfilter(I, Gx);
+    Y = imfilter(I, Gy);
+    M = uint8(sqrt(X.*X + Y.*Y));
+
+    G = atan(Y./X);
+    G = G + pi/2;
+    
+    G = G*(15/pi);
+    G = uint8(G);
+    histogram = zeros(1,16);
+    [m,n] = size(G);
+    for i = 1 : m
+        for j = 1 : n
+            histogram(G(i, j)+1) = histogram(G(i, j)+1) + double(M(i, j)); 
+        end
+    end
+    plot(histogram/max(histogram));
+%falta histogramar G sumando modulo M
 end
 
 
