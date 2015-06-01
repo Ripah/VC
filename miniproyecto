@@ -54,3 +54,16 @@ function [ Labels, HOGs ] = HOGS( )
         HOGs(i,:) = HOG(rgb2gray(I{i}), uint8(ROIs{i}));
     end
 end
+
+function [  ] = SaveHogAndLabels( Labels, HOG )
+    strings = char(Labels);
+    dlmwrite('trainingset_L.txt', strings, 'delimiter', '');
+    dlmwrite('trainingset_H.txt', HOG);
+end
+
+function [ Labels, HOG ] = LoadHogAndLabels( HOG_File, Labels_File )
+
+    HOG = importdata(HOG_File);
+    Labels = importdata(Labels_File);
+
+end
