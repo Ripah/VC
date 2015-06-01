@@ -5,49 +5,21 @@ function [result] = ROI( background, objectimage )
     result = imfill(Edges, 'holes');
 end
 
-function [ histogram ] = HOGv2( I, Mask )
-    if size(I, 3) == 3
-        I = rgb2gray(I);
-    end
-
-    [M, G] = imgradient(I,'prewitt');
-    M = uint8(M) .* Mask;
-    G = G + 180;
-    
-    G = G*(7/360);
-    G = uint8(G);
-    histogram = zeros(1,8);
-    [m,n] = size(G);
-    for i = 1 : m
-        for j = 1 : n
-            histogram(G(i, j)+1) = histogram(G(i, j)+1) + double(M(i, j)); 
-        end
-    end
-    histogram = histogram/sum(sum(histogram));
-end
-
 function [ histogram ] = HOG( I, Mask )
 
     if size(I, 3) == 3
         I = rgb2gray(I);
     end
-    Gx = [-1, 0, 1; -2, 0, 2; -1, 0, 1];
-    Gy = [1, 2, 1; 0, 0, 0; -1, -2, -1];
-    X = imfilter(I, Gx);
-    Y = imfilter(I, Gy);
-    M = uint8(sqrt(double(X.*X + Y.*Y)));
-    M = M .* Mask;
-    imshow(M);
-    G = atan(double(Y./X));
-    G = G + pi/2;
-    
-    G = G*(7/pi);
-    G = uint8(G);
+    [Gmag,Gdir] = imgradient(I);
+    Gdir = mod(Gdir + 180, 180);
+    Gdir = Gdir * (8/double(180.0));
+    Gdir = floor(Gdir);
+    Gmag = uint8(Gmag) .* Mask;
     histogram = zeros(1,8);
-    [m,n] = size(G);
+    [m,n] = size(Gdir);
     for i = 1 : m
         for j = 1 : n
-            histogram(G(i, j)+1) = histogram(G(i, j)+1) + double(M(i, j)); 
+            histogram(Gdir(i, j)+1) = histogram(Gdir(i, j)+1) + double(Gmag(i, j)); 
         end
     end
     histogram = histogram/sum(sum(histogram));
