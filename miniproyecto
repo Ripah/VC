@@ -5,6 +5,27 @@ function [result] = ROI( background, objectimage )
     result = imfill(Edges, 'holes');
 end
 
+function [ histogram ] = HOGv2( I, Mask )
+    if size(I, 3) == 3
+        I = rgb2gray(I);
+    end
+
+    [M, G] = imgradient(I,'prewitt');
+    M = uint8(M) .* Mask;
+    G = G + 180;
+    
+    G = G*(7/360);
+    G = uint8(G);
+    histogram = zeros(1,8);
+    [m,n] = size(G);
+    for i = 1 : m
+        for j = 1 : n
+            histogram(G(i, j)+1) = histogram(G(i, j)+1) + double(M(i, j)); 
+        end
+    end
+    histogram = histogram/sum(sum(histogram));
+end
+
 function [ histogram ] = HOG( I, Mask )
 
     if size(I, 3) == 3
