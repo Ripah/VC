@@ -55,11 +55,12 @@ function [ Labels, HOGs ] = HOGS( )
     end
 end
 
-function [  ] = SaveHogAndLabels( Labels, HOG )
+function [  ] = SaveHogAndLabels( Labels, Labels_filename, HOG, HOG_filename )
     strings = char(Labels);
-    dlmwrite('trainingset_L.txt', strings, 'delimiter', '');
-    dlmwrite('trainingset_H.txt', HOG);
+    dlmwrite(Labels_filename, strings, 'delimiter', '');
+    dlmwrite(HOG_filename, HOG);
 end
+
 
 function [ Labels, HOG ] = LoadHogAndLabels( HOG_File, Labels_File )
 
