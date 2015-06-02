@@ -88,3 +88,18 @@ function [ Labels, HOGs ] = HOGS( )
         HOGs(i,:) = HOG(rgb2gray(I{i}), uint8(ROIs{i}));
     end
 end
+
+function [ result, error ] = clasificar( imagen, fondo )
+    [labelName,labelPath] = uigetfile('*.vclabel', 'Selecciona los labels');
+    labelFile = fullfile(labelPath, labelName);
+    [hogName,hogPath] = uigetfile('*.vchog', 'Selecciona los HOGs');
+    hogFile = fullfile(hogPath, hogName);
+    
+    
+    [HOGs, Labels] = LoadHogAndLabels( hogFile, labelFile );
+    
+    mask = ROI(fondo, imagen);
+    hog = HOG(imagen, mask);
+    
+    [result, error] = classify(hog, HOGs, Labels, 'diagquadratic');
+end
