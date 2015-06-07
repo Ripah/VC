@@ -12,6 +12,42 @@ function [ histogram ] = HOG( I, Mask )
     end
     [Gmag,Gdir] = imgradient(I);
     Gdir = mod(Gdir + 180, 180);
+    
+    GdirOffset = Gdir * (36/double(180.0));
+    GdirOffset = floor(GdirOffset);
+    histogramoffset = zeros(1,36);
+    [m,n] = size(GdirOffset);
+    for i = 1 : m
+        for j = 1 : n
+            histogramoffset(GdirOffset(i, j)+1) = histogramoffset(GdirOffset(i, j)+1) + double(Gmag(i, j)); 
+        end
+    end
+    
+    [maxV, offsetIDX] = max(histogramoffset);
+    offset = offsetIDX*(180.0 / 36);
+    Gdir = Gdir - offset;
+    Gdir = mod(Gdir + 180, 180);
+    Gdir = Gdir * (8/double(180.0));
+    Gdir = floor(Gdir);
+    Gmag = uint8(Gmag) .* uint8(Mask);
+    
+    histogram = zeros(1,8);
+    [m,n] = size(Gdir);
+    for i = 1 : m
+        for j = 1 : n
+            histogram(Gdir(i, j)+1) = histogram(Gdir(i, j)+1) + double(Gmag(i, j)); 
+        end
+    end
+    histogram = histogram/sum(sum(histogram));
+end
+
+function [ histogram ] = HOG( I, Mask )
+
+    if size(I, 3) == 3
+        I = rgb2gray(I);
+    end
+    [Gmag,Gdir] = imgradient(I);
+    Gdir = mod(Gdir + 180, 180);
     Gdir = Gdir * (8/double(180.0));
     Gdir = floor(Gdir);
     Gmag = uint8(Gmag) .* uint8(Mask);
