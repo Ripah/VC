@@ -84,6 +84,31 @@ function [ Labels, HOGs ] = HOGS( )
     end
 end
 
+function [ Labels, Des ] = descriptor( )
+    [Filenames,Pathname] = uigetfile('*.jpg', 'multiselect','on');
+    [m,n] = size(Filenames);
+    I = cell(1, n);
+    Labels = cell(n, 1);
+    for i = 1:n
+        CurrentFile = fullfile(Pathname, cellstr(Filenames(i)));
+        S = char(Filenames(i));
+        Labels{i} = S(1:end-6);
+        a = imread(char(CurrentFile));
+        I{i}  = a;
+    end
+    [Filename,Pathname] = uigetfile('*.jpg', 'fondo');
+    fondo = imread(fullfile(Pathname, Filename));
+    ROIs = cell(n, 1);
+    HOGs = zeros(n, 8, 'double');
+    RGBs = zeros(n, 8, 'double');
+    for i = 1:n
+        ROIs{i} = ROI(I{i}, fondo);
+        HOGs(i,:) = HOG(rgb2gray(I{i}), ROIs{i});
+        RGBs(i,:) = RGB(I{i}, ROIs{i});
+    end
+    Des = cat(2, HOGs, RGBs);
+end
+
 function [  ] = SaveHogAndLabels( Labels, Labels_filename, HOG, HOG_filename )
     strings = char(Labels);
     dlmwrite(Labels_filename, strings, 'delimiter', '');
