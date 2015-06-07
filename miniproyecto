@@ -23,7 +23,25 @@ function [ histogram ] = HOG( I, Mask )
         end
     end
     
-    function [ histogram ] = RGB( I, Mask )
+    [maxV, offsetIDX] = max(histogramoffset);
+    offset = offsetIDX*(180.0 / 36);
+    Gdir = Gdir - offset;
+    Gdir = mod(Gdir + 180, 180);
+    Gdir = Gdir * (8/double(180.0));
+    Gdir = floor(Gdir);
+    Gmag = uint8(Gmag) .* uint8(Mask);
+    
+    histogram = zeros(1,8);
+    [m,n] = size(Gdir);
+    for i = 1 : m
+        for j = 1 : n
+            histogram(Gdir(i, j)+1) = histogram(Gdir(i, j)+1) + double(Gmag(i, j)); 
+        end
+    end
+    histogram = histogram/sum(sum(histogram));
+end
+
+function [ histogram ] = RGB( I, Mask )
 
     I = double(I) * (2.0 / 256);
     I =  uint8(floor(I));
@@ -42,24 +60,6 @@ function [ histogram ] = HOG( I, Mask )
     
     histogram = histogram/sum(sum(sum(histogram)));
     histogram = reshape(histogram, [1, 8]);
-end
-    
-    [maxV, offsetIDX] = max(histogramoffset);
-    offset = offsetIDX*(180.0 / 36);
-    Gdir = Gdir - offset;
-    Gdir = mod(Gdir + 180, 180);
-    Gdir = Gdir * (8/double(180.0));
-    Gdir = floor(Gdir);
-    Gmag = uint8(Gmag) .* uint8(Mask);
-    
-    histogram = zeros(1,8);
-    [m,n] = size(Gdir);
-    for i = 1 : m
-        for j = 1 : n
-            histogram(Gdir(i, j)+1) = histogram(Gdir(i, j)+1) + double(Gmag(i, j)); 
-        end
-    end
-    histogram = histogram/sum(sum(histogram));
 end
 
 function [ histogram ] = HOG( I, Mask )
