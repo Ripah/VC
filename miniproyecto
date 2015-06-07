@@ -23,6 +23,27 @@ function [ histogram ] = HOG( I, Mask )
         end
     end
     
+    function [ histogram ] = RGB( I, Mask )
+
+    I = double(I) * (2.0 / 256);
+    I =  uint8(floor(I));
+    histogram = zeros(2,2,2);
+    [m,n] = size(Mask);
+    for i = 1 : m
+        for j = 1 : n
+            r = I(i,j,1);
+            g = I(i,j,2);
+            b = I(i,j,3);
+            if Mask(i,j) ~= 0
+                histogram(r+1,g+1,b+1) = histogram(r+1,g+1,b+1) + 1; 
+            end
+        end
+    end
+    
+    histogram = histogram/sum(sum(sum(histogram)));
+    histogram = reshape(histogram, [1, 8]);
+end
+    
     [maxV, offsetIDX] = max(histogramoffset);
     offset = offsetIDX*(180.0 / 36);
     Gdir = Gdir - offset;
